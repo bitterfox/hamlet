@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.bitterfox"
-version = "0.0.2"
+version = "0.0.3-SNAPSHOT"
 
 configure<JavaPluginExtension> {
     sourceCompatibility = JavaVersion.toVersion("1.8")
