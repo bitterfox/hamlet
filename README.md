@@ -1,34 +1,32 @@
 # Hamlet
 
-Waist a time to write Hamcrest Matchers for objects?
-Let's use this to reduce the time to write a Matchers and enjoy coding tests!
+Are you tired of writing verbose Hamcrest Matchers for objects? Hamlet is here to streamline the process, saving you time and making test code writing more enjoyable!
 
-Hamlet provides fluent interface to write Hamcrest Matchers for any object in Java, with Java 1.8's Lambda
-and Method Reference.
+Hamlet provides a fluent interface for creating Hamcrest Matchers for any Java object, utilizing Java 1.8's Lambda and Method Reference features.
 
-You'll write assertion for object with Hamcrest Matchers like this:
+Normally, you might write assertions for an object using Hamcrest Matchers like this:
 
 ```java
 User user;
 assertThat(user, is(new User(...)));
 
-// However, construction of object might be noisy
-// Since too large constructor or requires many setters call
+// However, constructing objects can be cumbersome
+// due to large constructors or the need for multiple setter calls.
 
-// Sometimes you write assert for a only few fields
+// Sometimes you only want to assert a few fields
 assertThat(user.getId(), is(1L));
 assertThat(user.getName(), is("name"));
 
-// Let's assume user has Follower(s) and you'd like to test follow list
-// Again, we check some fields of Follower only
-// We want to assert user has follower with id=5
+// Imagine you want to test a user's list of followers
+// and only check specific fields of the Follower object.
+// For instance, you want to verify that the user has a follower with id=5.
 
-// You may write like this nowadays
+// You might currently write something like this:
 List<User> followers = user.getFollowers();
 assertThat(followers.stream().map(User::getId).collect(Collectors.toList()), hasItem(is(5L)));
 ```
 
-Hamlet let you write above scenario in better way!
+With Hamlet, you can express the above scenario in a cleaner and more elegant way!
 
 ```java
 User user;
@@ -38,27 +36,27 @@ assertThat(
         Hamlet.let(User::getId, is(1L))
               .let(User::getName, is("name")));
 
-// Hamlet#let starts fluent interface to build Matcher for object
-// You can specify the getter using the method reference for 1st argment and
-// specify Matcher for returned value by the method reference
-// So this call chain creats Matcher for User assert id is 1L and name is "name"
+// Hamlet#let initiates a fluent interface to construct a Matcher for an object.
+// You can designate a getter with a method reference as the first argument and
+// pair it with a Matcher for the method's return value.
+// This chain of calls creates a Matcher to assert that the User's id is 1L and name is "name".
 
-// This makes you to write assertion for follower simpler and more declarative way
+// This approach simplifies and makes assertions for followers more declarative.
 
 assertThat(
         user,
         Hamlet.let(User::getId, is(1L))
               .let(User::getName, is("name"))
               .let(User::getFollowers,
-                   hasItem(Hamlet.let(User::getId, is(5))
+                   hasItem(Hamlet.let(User::getId, is(5L))
               )));
 
-// You can read this assertion as
-// assert user that id is 1L, name is "name" and follower has item that id is 5L
+// This assertion reads as:
+// Assert that the user has an id of 1L, a name of "name", and a follower with an id of 5L.
 
-// Also Hamlet can generate better output to diagnosis assertion failure
-// Let's assume user doesn't have such follower in above example
-// Hamlet can generate following description for Hamcrest and assertThat
+// Hamlet also generates more informative output for diagnosing assertion failures.
+// If the user does not have the expected follower, Hamlet can generate a description like the following:
+
 
 java.lang.AssertionError:
 Expected:
@@ -73,12 +71,12 @@ at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)
 at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:6)
 at io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:104)
 
-// You see where is the underlying Matcher defined and you can jump to the code from IDE output panel
+// This output shows exactly where the mismatch occurred, allowing you to quickly navigate to the code from your IDE's output panel.
 ```
 
-# Getting started
+# Getting Started
 
-Add dependency to your project
+Add the following dependency to your project:
 ```kotlin
 dependencies {
     implementation("io.github.bitterfox:hamlet:0.0.2")
@@ -87,55 +85,45 @@ dependencies {
 
 # Interface
 
-# Hamlet static methods
-You can create Hamlet Matcher from `io.github.bitterfox.hamlet.Hamlet#let`.
-`Hamlet#let` has 2 overloads.
+## Hamlet Static Methods
+Create a Hamlet Matcher using `io.github.bitterfox.hamlet.Hamlet#let`. There are three overloads of `Hamlet#let`.
 
 ```java
-Hamlet.let(); // Hamlet.let()
-// You can start Hamlet Matcher without any matcher
-// You can test null value using this method: Hamlet.let().is(nullValue())
-// Usually meaningless
+Hamlet.let(); // Starts a Hamlet Matcher without any predefined matcher.
+// Useful for testing null values: Hamlet.let().is(nullValue())
+// Generally not useful otherwise.
 
-Hamlet.let(User.class); // Hamlet.let(Class<T>)
-// You can start Hamlet Matcher specifying class `isA` Matcher is added
+Hamlet.let(User.class); // Initializes a Hamlet Matcher that expects instances of the specified class, i.e. expect non null.
 
-Hamlet.let(User::getId, is(1L)); // Hamlet.let(Function<T, U>, Matcher<U>)
-// You can also start Hamlet Matcher with notNullValue Matcher and specified Function and Matcher
+Hamlet.let(User::getId, is(1L)); // Starts a Hamlet Matcher with a notNullValue Matcher, a specified Function, and a Matcher.
 ```
 
-`Hamlet.let` returns `HamletMatcher` with following methods
+`Hamlet.let` returns a `HamletMatcher` with the following methods:
 
-## HamletMatcher
+## HamletMatcher Methods
 ```java
-hamletMatcher.as(AnotherClass.class); // HamletMatcher.as(Class<T>)
-// You can change the expected type
+hamletMatcher.as(AnotherClass.class); // Changes the expected type.
 
-hamletMatcher.let(User::name, is("name")) // HamletMatcher.let(Function<T, U>, Matcher<U>)
+hamletMatcher.let(User::getName, is("name")); // Adds a Matcher for a specific getter.
 
-hamletMatcher.letIn(User::getFollowers) // HamletMatcher.letIn(Function<T, U>)
-// This map object to another type using the function and you can continue adding matcher
+hamletMatcher.letIn(User::getFollowers); // Maps the object to another type and allows for continued Matcher addition for the type.
 
-hamletMatcher.it(is("name")) // HamletMatcher.it(Matcher<T>)
-// Add matcher for current mapped value
+hamletMatcher.it(is("name")); // Adds a Matcher for the current mapped value.
 
-hamletMatcher.end()
-// Finish letIn context and back to previous mapping
+hamletMatcher.end(); // Ends the letIn context and returns to the previous mapping.
 ```
 
-For `letIn`, explain it with example.
-In above example, we assert followers in User.
-But if the object structure is deep, the indent goes to too right in the editor.
-`letIn` allows you to write matcher flatten with mapping object.
+For `letIn`, consider the following example. Here, we assert properties of the followers within a User object. If the object structure is deeply nested, code indentation can become unwieldy. `letIn` allows you to write matchers in a flattened manner by mapping the object.
+
 ```java
 assertThat(
         user,
         Hamlet.let(User::getId, is(1L))
               .let(User::getName, is("name"))
-              .letIn(User::getFollowers) // Map to follower: List<User>
-              .it(hasItem(Hamlet.let(User::getId, is(5)))) // Add Matcher for User::getFollowers
+              .letIn(User::getFollowers) // Maps to followers: List<User>
+              .it(hasItem(Hamlet.let(User::getId, is(5L)))) // Adds a Matcher for User::getFollowers
               .let(List::size, is(3L))
-              .end() // Back to User
+              .end() // Returns to User context
               .let(User::updatedTime, is(timestamp))
 );
 ```
