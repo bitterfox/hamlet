@@ -79,7 +79,7 @@ at io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:104)
 Add the following dependency to your project:
 ```kotlin
 dependencies {
-    implementation("io.github.bitterfox:hamlet:0.0.2")
+    implementation("io.github.bitterfox:hamlet:0.0.3")
 }
 ```
 
