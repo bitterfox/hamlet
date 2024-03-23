@@ -15,7 +15,7 @@ assertThat(user, is(new User(...)));
 // However, construction of object might be noisy
 // Since too large constructor or requires many setters call
 
-// Sometimes you write assert for field
+// Sometimes you write assert for a only few fields
 assertThat(user.getId(), is(1L));
 assertThat(user.getName(), is("name"));
 

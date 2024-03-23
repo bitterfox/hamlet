@@ -23,6 +23,10 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
 public class Hamlet {
+    public static <T> HamletMatcher<T, T, ?> let() {
+        return new HamletMatcherImpl<>(null, Function.identity(), null);
+    }
+
     public static <T> HamletMatcher<T, T, ?> let(Class<T> clazz) {
         return new HamletMatcherImpl<>(null, Function.identity(), Matchers.isA(clazz));
     }

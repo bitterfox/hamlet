@@ -19,13 +19,14 @@
 
 package io.github.bitterfox.hamlet;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
@@ -109,7 +110,7 @@ class HamletTest {
         );
 
 
-        MatcherAssert.assertThat(
+        assertThat(
                 user,
                 Hamlet.let(User::id, is(10L))
                       .let(User::name, is("myname"))
@@ -125,9 +126,19 @@ class HamletTest {
                       .end()
         );
 
-        MatcherAssert.assertThat(
+        assertThat(
                 user,
                 Hamlet.let(Id::id, is(10L))
+        );
+    }
+
+    @Test
+    void testNull() {
+        User user = null;
+        assertThat(
+                user,
+                Hamlet.let()
+                      .is(nullValue())
         );
     }
 }
