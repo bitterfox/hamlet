@@ -114,7 +114,7 @@ class HamletTest {
                       .let(User::name, is("myname"))
                       .let(User::createdTime, is(1234L))
                       .let(User::bankAccounts, hasItem(
-                              Hamlet.let(BankAccount::id, is(5L))))
+                              Hamlet.let(BankAccount::id, is(90L))))
                       .letIn(User::bankAccounts)
                       .is(Matchers.contains(Hamlet.let(BankAccount::id, is(90L))))
                       .letIn(List::getFirst)
