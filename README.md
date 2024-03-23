@@ -101,7 +101,7 @@ Hamlet.let(User::getId, is(1L)) // Hamlet.let(Function<T, U>, Matcher<U>)
 
 `Hamlet.let` returns `HamletMatcher` with following methods
 
-## HamletMatcher#as
+## HamletMatcher
 ```java
 hamletMatcher.as(AnotherClass.class); // HamletMatcher.as(Class<T>)
 // You can change the expected type
