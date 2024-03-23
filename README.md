@@ -92,11 +92,16 @@ You can create Hamlet Matcher from `io.github.bitterfox.hamlet.Hamlet#let`.
 `Hamlet#let` has 2 overloads.
 
 ```java
+Hamlet.let(); // Hamlet.let()
+// You can start Hamlet Matcher without any matcher
+// You can test null value using this method: Hamlet.let().is(nullValue())
+// Usually meaningless
+
 Hamlet.let(User.class); // Hamlet.let(Class<T>)
 // You can start Hamlet Matcher specifying class `isA` Matcher is added
 
-Hamlet.let(User::getId, is(1L)) // Hamlet.let(Function<T, U>, Matcher<U>)
-// You can also start Hamlet Matcher for specifying Function and Matcher
+Hamlet.let(User::getId, is(1L)); // Hamlet.let(Function<T, U>, Matcher<U>)
+// You can also start Hamlet Matcher with notNullValue Matcher and specified Function and Matcher
 ```
 
 `Hamlet.let` returns `HamletMatcher` with following methods
