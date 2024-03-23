@@ -116,7 +116,7 @@ hamletMatcher.let(User::name, is("name")) // HamletMatcher.let(Function<T, U>, M
 hamletMatcher.letIn(User::getFollowers) // HamletMatcher.letIn(Function<T, U>)
 // This map object to another type using the function and you can continue adding matcher
 
-hamletMatcher.is(is("name")) // HamletMatcher.is(Matcher<T>)
+hamletMatcher.it(is("name")) // HamletMatcher.it(Matcher<T>)
 // Add matcher for current mapped value
 
 hamletMatcher.end()
@@ -133,7 +133,7 @@ assertThat(
         Hamlet.let(User::getId, is(1L))
               .let(User::getName, is("name"))
               .letIn(User::getFollowers) // Map to follower: List<User>
-              .is(hasItem(Hamlet.let(User::getId, is(5)))) // Add Matcher for User::getFollowers
+              .it(hasItem(Hamlet.let(User::getId, is(5)))) // Add Matcher for User::getFollowers
               .let(List::size, is(3L))
               .end() // Back to User
               .let(User::updatedTime, is(timestamp))

@@ -53,7 +53,7 @@ class HamletMatcherImpl<S, T, M extends Matcher<S>> extends DiagnosingMatcher<S>
     public <U> HamletMatcherImpl<S, T, M> let(java.util.function.Function<? super T, ? extends U> function,
                                               Matcher<? super U> matcher) {
         if (this.matcher == null) {
-            return new HamletMatcherImpl<>(this.is(Matchers.notNullValue()), this.function, new LetMatcher<>(function, matcher));
+            return new HamletMatcherImpl<>(this.it(Matchers.notNullValue()), this.function, new LetMatcher<>(function, matcher));
         } else {
             return new HamletMatcherImpl<>(this, this.function, new LetMatcher<>(function, matcher));
         }
@@ -66,7 +66,7 @@ class HamletMatcherImpl<S, T, M extends Matcher<S>> extends DiagnosingMatcher<S>
     }
 
     @Override
-    public HamletMatcherImpl<S, T, M> is(Matcher<? super T> matcher) {
+    public HamletMatcherImpl<S, T, M> it(Matcher<? super T> matcher) {
         return new HamletMatcherImpl<>(this, function, new LetMatcher<>(java.util.function.Function.identity(), matcher));
     }
 

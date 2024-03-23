@@ -49,7 +49,7 @@ public class MockHamletMatcher<S, T, M extends Matcher<S>> implements HamletMatc
     }
 
     @Override
-    public HamletMatcher<S, T, M> is(Matcher<? super T> matcher) {
+    public HamletMatcher<S, T, M> it(Matcher<? super T> matcher) {
         return this;
     }
 

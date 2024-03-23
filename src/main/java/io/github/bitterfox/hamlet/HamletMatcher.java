@@ -31,7 +31,7 @@ public interface HamletMatcher<S, T, M extends Matcher<S>> extends Matcher<S> {
 
     <U> HamletMatcher<S, U, HamletMatcher<S, T, M>> letIn(Function<? super T, ? extends U> function);
 
-    HamletMatcher<S, T, M> is(Matcher<? super T> matcher);
+    HamletMatcher<S, T, M> it(Matcher<? super T> matcher);
 
     M end();
 }

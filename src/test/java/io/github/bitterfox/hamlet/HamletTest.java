@@ -27,7 +27,6 @@ import static org.hamcrest.Matchers.nullValue;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 class HamletTest {
@@ -118,7 +117,7 @@ class HamletTest {
                       .let(User::bankAccounts, hasItem(
                               Hamlet.let(BankAccount::id, is(90L))))
                       .letIn(User::bankAccounts)
-                      .is(Matchers.hasItem(Hamlet.let(BankAccount::id, is(90L))))
+                      .it(hasItem(Hamlet.let(BankAccount::id, is(90L))))
                       .letIn(l -> l.get(1))
                       .let(BankAccount::currency, is("$"))
                       .end()
@@ -138,7 +137,7 @@ class HamletTest {
         assertThat(
                 user,
                 Hamlet.let()
-                      .is(nullValue())
+                      .it(nullValue())
         );
     }
 }

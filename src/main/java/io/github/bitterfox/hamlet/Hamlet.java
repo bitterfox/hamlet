@@ -33,6 +33,6 @@ public class Hamlet {
 
     public static <T, U> HamletMatcher<T, T, ?> let(java.util.function.Function<? super T, ? extends U> function, Matcher<? super U> matcher) {
         return new HamletMatcherImpl<>(null, Function.<T>identity(), Matchers.notNullValue())
-                .is(new LetMatcher<>(function, matcher));
+                .it(new LetMatcher<>(function, matcher));
     }
 }
