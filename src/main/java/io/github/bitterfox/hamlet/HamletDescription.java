@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 import org.hamcrest.Description;
 import org.hamcrest.SelfDescribing;
 
-public class HamletDescription implements Description {
+class HamletDescription implements Description {
     private final Description delegate;
     private static final ThreadLocal<Integer> DEPTH = ThreadLocal.withInitial(() -> 8);
 

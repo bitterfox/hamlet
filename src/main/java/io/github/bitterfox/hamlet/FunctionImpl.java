@@ -19,7 +19,7 @@
 
 package io.github.bitterfox.hamlet;
 
-public class FunctionImpl<S, T, U> implements Function<S, T, U> {
+class FunctionImpl<S, T, U> implements Function<S, T, U> {
     private Function<S, ?, T> previousFunction;
     private java.util.function.Function<? super T, ? extends U> function;
 

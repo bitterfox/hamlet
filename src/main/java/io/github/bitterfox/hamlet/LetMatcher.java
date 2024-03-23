@@ -25,7 +25,7 @@ import org.hamcrest.Description;
 import org.hamcrest.DiagnosingMatcher;
 import org.hamcrest.Matcher;
 
-public class LetMatcher<T, U> extends DiagnosingMatcher<T> {
+class LetMatcher<T, U> extends DiagnosingMatcher<T> {
     private final Function<? super T, ? extends U> function;
     private final Matcher<U> matcher;
     private final StackTraceElement location;
@@ -38,7 +38,12 @@ public class LetMatcher<T, U> extends DiagnosingMatcher<T> {
 
     @Override
     protected boolean matches(Object item, Description mismatchDescription) {
-        U value = function.apply((T) item);
+        U value;
+        try {
+            value = function.apply((T) item);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getClass() + " at " + location, e);
+        }
         if (matcher.matches(value)) {
             return true;
         }

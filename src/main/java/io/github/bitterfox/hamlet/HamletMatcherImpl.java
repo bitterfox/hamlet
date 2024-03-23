@@ -24,7 +24,7 @@ import org.hamcrest.DiagnosingMatcher;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
-public class HamletMatcherImpl<S, T, M extends Matcher<S>> extends DiagnosingMatcher<S> implements HamletMatcher<S, T, M> {
+class HamletMatcherImpl<S, T, M extends Matcher<S>> extends DiagnosingMatcher<S> implements HamletMatcher<S, T, M> {
     private final HamletMatcherImpl<S, ?, ?> upstream;
     private final Function<S, ?, T> function;
     private final LetMatcher<? super T, ?> matcher;
@@ -52,7 +52,11 @@ public class HamletMatcherImpl<S, T, M extends Matcher<S>> extends DiagnosingMat
     @Override
     public <U> HamletMatcherImpl<S, T, M> let(java.util.function.Function<? super T, ? extends U> function,
                                               Matcher<? super U> matcher) {
-        return new HamletMatcherImpl<>(this, this.function, new LetMatcher<>(function, matcher));
+        if (this.matcher == null) {
+            return new HamletMatcherImpl<>(this.is(Matchers.notNullValue()), this.function, new LetMatcher<>(function, matcher));
+        } else {
+            return new HamletMatcherImpl<>(this, this.function, new LetMatcher<>(function, matcher));
+        }
     }
 
     @Override
@@ -62,7 +66,7 @@ public class HamletMatcherImpl<S, T, M extends Matcher<S>> extends DiagnosingMat
     }
 
     @Override
-    public HamletMatcher<S, T, M> is(Matcher<? super T> matcher) {
+    public HamletMatcherImpl<S, T, M> is(Matcher<? super T> matcher) {
         return new HamletMatcherImpl<>(this, function, new LetMatcher<>(java.util.function.Function.identity(), matcher));
     }
 

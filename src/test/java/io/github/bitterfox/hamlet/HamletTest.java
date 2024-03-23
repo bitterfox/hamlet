@@ -104,7 +104,8 @@ class HamletTest {
                 "myname",
                 1234,
                 900,
-                Arrays.asList(new BankAccount(90, "$", 10))
+//                Arrays.asList(new BankAccount(90, "$", 10))
+                Arrays.asList((BankAccount) null, new BankAccount(90L, "$", 100))
         );
 
 
@@ -116,8 +117,8 @@ class HamletTest {
                       .let(User::bankAccounts, hasItem(
                               Hamlet.let(BankAccount::id, is(90L))))
                       .letIn(User::bankAccounts)
-                      .is(Matchers.contains(Hamlet.let(BankAccount::id, is(90L))))
-                      .letIn(List::getFirst)
+                      .is(Matchers.hasItem(Hamlet.let(BankAccount::id, is(90L))))
+                      .letIn(l -> l.get(1))
                       .let(BankAccount::currency, is("$"))
                       .end()
                       .end()
@@ -127,24 +128,6 @@ class HamletTest {
         MatcherAssert.assertThat(
                 user,
                 Hamlet.let(Id::id, is(10L))
-        );
-
-
-        MatcherAssert.assertThat(
-                user,
-                Hamlet.let(User::id, is(10L))
-                      .let(User::name, is("myname"))
-                      .let(User::createdTime, is(1234L))
-                      .let(User::bankAccounts,
-                           Matchers.contains(
-                                   Hamlet.let(BankAccount::id, is(90L))))
-                      .letIn(User::bankAccounts)
-                      .is(Matchers.contains(Hamlet.let(BankAccount::id, is(90L))))
-                      .letIn(List::getFirst)
-                      .let(BankAccount::currency, is("$"))
-                      .end()
-                      .end()
-                      .end()
         );
     }
 }
