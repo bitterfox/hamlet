@@ -19,6 +19,7 @@
 
 package io.github.bitterfox.hamlet;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 
 import java.util.Arrays;
@@ -29,7 +30,12 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 class HamletTest {
-    class User {
+
+    interface Id {
+        long id();
+    }
+
+    class User implements Id {
         long id;
         String name;
         long createdTime;
@@ -89,6 +95,8 @@ class HamletTest {
         }
     }
 
+    interface I {}
+
     @Test
     void test() {
         User user = new User(
@@ -98,6 +106,29 @@ class HamletTest {
                 900,
                 Arrays.asList(new BankAccount(90, "$", 10))
         );
+
+
+        MatcherAssert.assertThat(
+                user,
+                Hamlet.let(User::id, is(10L))
+                      .let(User::name, is("myname"))
+                      .let(User::createdTime, is(1234L))
+                      .let(User::bankAccounts, hasItem(
+                              Hamlet.let(BankAccount::id, is(5L))))
+                      .letIn(User::bankAccounts)
+                      .is(Matchers.contains(Hamlet.let(BankAccount::id, is(90L))))
+                      .letIn(List::getFirst)
+                      .let(BankAccount::currency, is("$"))
+                      .end()
+                      .end()
+                      .end()
+        );
+
+        MatcherAssert.assertThat(
+                user,
+                Hamlet.let(Id::id, is(10L))
+        );
+
 
         MatcherAssert.assertThat(
                 user,
