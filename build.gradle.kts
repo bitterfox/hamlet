@@ -8,6 +8,11 @@ plugins {
 group = "io.github.bitterfox"
 version = "0.0.1-SNAPSHOT"
 
+configure<JavaPluginExtension> {
+    sourceCompatibility = JavaVersion.toVersion("1.8")
+    targetCompatibility = JavaVersion.toVersion("1.8")
+}
+
 repositories {
     mavenCentral()
 }

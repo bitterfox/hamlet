@@ -26,7 +26,7 @@ public interface Function<S, T, U> {
     <R> Function<S, U, R> andThen(java.util.function.Function<? super U, ? extends R> function);
 
     static <T> Function<T, T, T> identity() {
-        return new Function<>() {
+        return new Function<T, T, T>() {
             @Override
             public T apply(T t) {
                 return t;

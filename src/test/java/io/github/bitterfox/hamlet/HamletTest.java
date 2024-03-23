@@ -21,28 +21,73 @@ package io.github.bitterfox.hamlet;
 
 import static org.hamcrest.Matchers.is;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-import io.github.bitterfox.hamlet.Hamlet;
-
 class HamletTest {
-    private record User(
-            long id,
-            String name,
-            long createdTime,
-            long updatedTime,
-            List<BankAccount> bankAccounts
-    ) {}
+    class User {
+        long id;
+        String name;
+        long createdTime;
+        long updatedTime;
+        List<BankAccount> bankAccounts;
 
-    private record BankAccount(
-            long id,
-            String currency,
-            long amount
-    ) {}
+        public User(long id, String name, long createdTime, long updatedTime, List<BankAccount> bankAccounts) {
+            this.id = id;
+            this.name = name;
+            this.createdTime = createdTime;
+            this.updatedTime = updatedTime;
+            this.bankAccounts = bankAccounts;
+        }
+
+        public long id() {
+            return id;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public long createdTime() {
+            return createdTime;
+        }
+
+        public long updatedTime() {
+            return updatedTime;
+        }
+
+        public List<BankAccount> bankAccounts() {
+            return bankAccounts;
+        }
+    }
+
+    class BankAccount {
+        long id;
+        String currency;
+        long amount;
+
+        public BankAccount(long id, String currency, long amount) {
+            this.id = id;
+            this.currency = currency;
+            this.amount = amount;
+        }
+
+        public long id() {
+            return id;
+        }
+
+        public String currency() {
+            return currency;
+        }
+
+        public long amount() {
+            return amount;
+        }
+    }
 
     @Test
     void test() {
@@ -51,7 +96,7 @@ class HamletTest {
                 "myname",
                 1234,
                 900,
-                List.of(new BankAccount(90, "$", 10))
+                Arrays.asList(new BankAccount(90, "$", 10))
         );
 
         MatcherAssert.assertThat(
