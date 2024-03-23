@@ -19,15 +19,28 @@
 
 package io.github.bitterfox.hamlet;
 
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
+public interface Function<S, T, U> {
+    U apply(S s);
+    Function<S, ?, T> previousFunction();
 
-public class Hamlet {
-    public static <T> HamletMatcher<T, T, ?> let(Class<T> clazz) {
-        return new HamletMatcherImpl<>(null, Function.identity(), Matchers.isA(clazz));
-    }
+    <R> Function<S, U, R> andThen(java.util.function.Function<? super U, ? extends R> function);
 
-    public static <T, U> HamletMatcher<T, T, ?> let(java.util.function.Function<? super T, ? extends U> function, Matcher<? super U> matcher) {
-        return new HamletMatcherImpl<>(null, Function.identity(), new LetMatcher<>(function, matcher));
+    static <T> Function<T, T, T> identity() {
+        return new Function<>() {
+            @Override
+            public T apply(T t) {
+                return t;
+            }
+
+            @Override
+            public Function<T, ?, T> previousFunction() {
+                return Function.identity();
+            }
+
+            @Override
+            public <R> Function<T, T, R> andThen(java.util.function.Function<? super T, ? extends R> function) {
+                return new FunctionImpl<>(this, function);
+            }
+        };
     }
 }

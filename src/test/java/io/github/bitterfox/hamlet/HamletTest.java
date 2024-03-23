@@ -19,14 +19,15 @@
 
 package io.github.bitterfox.hamlet;
 
-import static io.github.bitterfox.hamlet.Hamlet.let;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
 import java.util.List;
 
-import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
+
+import io.github.bitterfox.hamlet.Hamlet;
 
 class HamletTest {
     private record User(
@@ -45,17 +46,24 @@ class HamletTest {
 
     @Test
     void test() {
-        User user = null;
+        User user = new User(
+                10,
+                "myname",
+                1234,
+                900,
+                List.of(new BankAccount(90, "$", 10))
+        );
 
-        assertThat(user,
-                Hamlet.let(User::id, is(10))
+        MatcherAssert.assertThat(
+                user,
+                Hamlet.let(User::id, is(10L))
                       .let(User::name, is("myname"))
-                      .let(User::createdTime, is(1234))
+                      .let(User::createdTime, is(1234L))
                       .let(User::bankAccounts,
-                           contains(
-                                   let(BankAccount::id, is(90))))
+                           Matchers.contains(
+                                   Hamlet.let(BankAccount::id, is(90L))))
                       .letIn(User::bankAccounts)
-                      .is(contains(let(BankAccount::id, is(90))))
+                      .is(Matchers.contains(Hamlet.let(BankAccount::id, is(90L))))
                       .letIn(List::getFirst)
                       .let(BankAccount::currency, is("$"))
                       .end()
@@ -63,6 +71,4 @@ class HamletTest {
                       .end()
         );
     }
-
-    private <T> void assertThat(T t, Matcher<? super T> matcher) {}
 }

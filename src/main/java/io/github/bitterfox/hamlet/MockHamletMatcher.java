@@ -32,8 +32,8 @@ public class MockHamletMatcher<S, T, M extends Matcher<S>> implements HamletMatc
     }
 
     @Override
-    public <U extends T> HamletMatcher<S, U, M> as(Class<U> clazz) {
-        return (HamletMatcher<S, U, M>) this;
+    public <U> HamletMatcher<S, U, M> as(Class<U> clazz) {
+        return null;
     }
 
     @Override
