@@ -19,10 +19,16 @@
 
 package io.github.bitterfox.hamlet;
 
-public class MappedValue<T, U, V extends MappedValue<U, ?, ?>> {
+public class MappedValue<T, P, V extends MappedValue<P, ?, ?>> {
     V previousValue;
     T value;
     int letInScope;
+
+    public MappedValue(V previousValue, T value, int letInScope) {
+        this.previousValue = previousValue;
+        this.value = value;
+        this.letInScope = letInScope;
+    }
 
     public MappedValue(V previousValue, T value, boolean letIn, boolean end) {
         this(previousValue, value, letIn);
@@ -54,5 +60,25 @@ public class MappedValue<T, U, V extends MappedValue<U, ?, ?>> {
 
     public int letInScope() {
         return letInScope;
+    }
+
+    <U> MappedValue<U, T, MappedValue<T, P, V>> identity() {
+        return new MappedValue<>(this, (U) this.value, this.letInScope());
+    }
+
+    <U> MappedValue<U, T, MappedValue<T, P, V>> letIn(U value) {
+        return new MappedValue<>(this, value, this.letInScope + 1);
+    }
+
+    <U> MappedValue<U, T, MappedValue<T, P, V>> end() {
+        MappedValue letInValue = this;
+        while (letInValue != null && this.letInScope <= letInValue.letInScope()) {
+            letInValue = letInValue.previousValue;
+        }
+        if (letInValue == null) {
+            return new MappedValue(this, null, this.letInScope - 1);
+        } else {
+            return new MappedValue(this, letInValue.value(), letInScope - 1);
+        }
     }
 }

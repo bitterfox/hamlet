@@ -87,16 +87,7 @@ class HamletMatcherImpl<S, P, T, M extends Matcher<S>> extends DiagnosingMatcher
             @Override
             public MappedValue requestValue(Object item) {
                 MappedValue mappedValue = super.requestValue(item);
-
-                MappedValue letInValue = mappedValue;
-                while (letInValue != null && mappedValue.letInScope <= letInValue.letInScope()) {
-                    letInValue = letInValue.previousValue;
-                }
-                if (letInValue == null) {
-                    return new MappedValue(mappedValue, null, false, false);
-                } else {
-                    return new MappedValue(mappedValue.previousValue, letInValue.value(), false, true);
-                }
+                return mappedValue.previousValue().end();
             }
         };
     }
@@ -150,7 +141,9 @@ class HamletMatcherImpl<S, P, T, M extends Matcher<S>> extends DiagnosingMatcher
         }
         if (matcher != null) {
             try {
-                return matcher.matches(value.value(), mismatchDescription) && matched;
+                if (value.value() != null) {
+                    return matcher.matches(value.value(), mismatchDescription) && matched;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -167,9 +160,9 @@ class HamletMatcherImpl<S, P, T, M extends Matcher<S>> extends DiagnosingMatcher
 
         if (letIn == null) {
             // pass through, T == P
-            return new MappedValue<>(value, (T) value.value(), false);
+            return value.identity();
         }
 
-        return new MappedValue<>(value, letIn.apply(value.value()), true);
+        return value.letIn(letIn.apply(value.value()));
     }
 }
