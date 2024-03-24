@@ -19,20 +19,21 @@
 
 package io.github.bitterfox.hamlet;
 
+import java.util.function.Function;
+
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 
-public class Hamlet {
-    public static <T> HamletMatcher<T, T, ?> let() {
-        return new HamletMatcherStageRoot<>();
+public class HamletMatcherStageLetIn<S, P, T, M extends Matcher<S>> extends HamletMatcherStage<S, P, T, T, M> {
+    private final Function<? super P, ? extends T> function;
+
+    public HamletMatcherStageLetIn(HamletMatcherStage<S, ?, P, ?, ?> upstream,
+                                   Function<? super P, ? extends T> function) {
+        super(upstream, null);
+        this.function = function;
     }
 
-    public static <T> HamletMatcher<T, T, ?> let(Class<T> clazz) {
-        return new HamletMatcherStageRoot<>(Matchers.isA(clazz));
-    }
-
-    public static <T, U> HamletMatcher<T, T, ?> let(java.util.function.Function<? super T, ? extends U> function, Matcher<? super U> matcher) {
-        return new HamletMatcherStageRoot<T, Matcher<T>>(Matchers.notNullValue())
-                .let(function, matcher);
+    @Override
+    MappedValue<T, P, T, ?> requestValue(MappedValue<P, ?, ?, ?> upstreamValue) {
+        return upstreamValue.letIn(function);
     }
 }

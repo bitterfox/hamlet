@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 class HamletTest {
@@ -110,13 +111,14 @@ class HamletTest {
                 Arrays.asList((BankAccount) null, new BankAccount(90L, "$", 100))
         );
 
-        HamletMatcherImpl<User, ?, ?, ?, ?> matcher = (HamletMatcherImpl<User, ?, ?, ?, ?>)
+        HamletMatcherStage<User, ?, ?, ?, ?> matcher = (HamletMatcherStage<User, ?, ?, ?, ?>)
                 Hamlet.let(User::id, is(10L))
                       .let(User::name, is("myname"))
                       .let(User::createdTime, is(1234L))
                       .let(User::bankAccounts, hasItem(
                               Hamlet.let(BankAccount::id, is(90L))))
                       .letIn(User::bankAccounts)
+                      .it(Matchers.isA(List.class))
                       .it(hasItem(Hamlet.let(BankAccount::id, is(90L))))
                       .letIn(l -> l.get(1))
                       .let(BankAccount::currency, is("$"))
@@ -134,6 +136,11 @@ class HamletTest {
         assertThat(
                 user,
                 Hamlet.let(Id::id, is(10L))
+        );
+
+        assertThat(
+                user.bankAccounts(),
+                hasItem(Hamlet.let(BankAccount::id, is(90L)))
         );
     }
 

@@ -85,7 +85,7 @@ class LetMatcher<T, U> extends DiagnosingMatcher<T> {
             if (!stackTrace.getClassName().equals(Thread.class.getName())
                 && !stackTrace.getClassName().equals(LetMatcher.class.getName())
                 && !stackTrace.getClassName().equals(Hamlet.class.getName())
-                && !stackTrace.getClassName().equals(HamletMatcherImpl.class.getName())) {
+                && !stackTrace.getClassName().startsWith(HamletMatcherStage.class.getName())) {
                 return stackTrace;
             }
         }

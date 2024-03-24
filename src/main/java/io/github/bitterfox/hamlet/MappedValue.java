@@ -19,6 +19,7 @@
 
 package io.github.bitterfox.hamlet;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 public class MappedValue<T, P, L, V extends MappedValue<P, ?, ?, ?>> {
@@ -67,6 +68,15 @@ public class MappedValue<T, P, L, V extends MappedValue<P, ?, ?, ?>> {
     }
 
     <U, M> MappedValue<U, T, M, MappedValue<T, P, L, V>> let(Function<? super U, ? extends M> f) {
-        return new MappedValue<>(this, (U) this.value, f.apply((U) this.value), this.letInScope());
+        if (this.value == null) {
+            return new MappedValue<>(this, null, null, this.letInScope());
+        } else {
+            return new MappedValue<>(this, (U) this.value, f.apply((U) this.value), this.letInScope());
+        }
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toString(letValue == null ? value : letValue);
     }
 }
