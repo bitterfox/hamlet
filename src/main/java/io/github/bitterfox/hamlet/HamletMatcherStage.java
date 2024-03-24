@@ -20,6 +20,8 @@
 package io.github.bitterfox.hamlet;
 
 import static io.github.bitterfox.hamlet.LanguageUtil.findLocation;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,6 @@ import org.hamcrest.Description;
 import org.hamcrest.Description.NullDescription;
 import org.hamcrest.DiagnosingMatcher;
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 
 abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends DiagnosingMatcher<S> implements HamletMatcher<S, T, M> {
     private final HamletMatcherStage<S, ?, P, ?, ?> upstream;
@@ -52,7 +53,7 @@ abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends Diag
     public <U> HamletMatcherStage<S, T, T, U, M> let(MyFunction<? super T, ? extends U> function,
                                                      Matcher<? super U> matcher) {
         if (this.matcher == null) {
-            return new HamletMatcherStageLet<>(this.it(Matchers.notNullValue()), new LetMatcher<>(/*function, */matcher), function);
+            return new HamletMatcherStageLet<>(this.it(is(notNullValue())), new LetMatcher<>(/*function, */matcher), function);
         } else {
             return new HamletMatcherStageLet<>(this, new LetMatcher<>(/*function, */matcher), function);
         }

@@ -75,14 +75,22 @@ class LetMatcher<T, U> extends DiagnosingMatcher<T> {
 
     @Override
     public void describeTo(Description description) {
+        describeTo(description, "");
+    }
+    public void describeTo(Description description, String valueDescription) {
         HamletDescription desc;
         if (description instanceof HamletDescription) {
             desc = (HamletDescription) description;
         } else {
             desc = new HamletDescription(description);
         }
-        desc.appendLocation(location)
-            .appendText("expect it ");
+        desc.appendLocation(location);
+        if (valueDescription.isEmpty()) {
+            desc.appendText("it ");
+        } else {
+            desc.appendText(valueDescription)
+                    .appendText(" ");
+        }
         desc.plusDepth(4);
         try {
             matcher.describeTo(desc);

@@ -124,7 +124,7 @@ class HamletTest {
                 Hamlet.let(User::getId, is(10L))
                       .let(User::getName, is("myname"))
                       .let(User::bankAccounts,
-                           hasItem(Hamlet.let(BankAccount::id, is(5L))))
+                           hasItem(Hamlet.let(BankAccount::id, is(90L))))
         );
 
         HamletMatcherStage<User, ?, ?, ?, ?> matcher = (HamletMatcherStage<User, ?, ?, ?, ?>)

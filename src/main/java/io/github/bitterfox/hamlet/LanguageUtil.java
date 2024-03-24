@@ -30,6 +30,10 @@ class LanguageUtil {
      * @return
      */
     static String describeMethodReference(MyFunction<?, ?> f) {
+        return describeMethodReference(f, true);
+    }
+
+    static String describeMethodReference(MyFunction<?, ?> f, boolean shortDescription) {
         for (Class<?> cl = f.getClass(); cl != null; cl = cl.getSuperclass()) {
             try {
                 Method m = cl.getDeclaredMethod("writeReplace");
@@ -38,7 +42,17 @@ class LanguageUtil {
                 if(!(replacement instanceof SerializedLambda))
                     break;// custom interface implementation
                 SerializedLambda l = (SerializedLambda) replacement;
-                return l.getImplClass().replace('/', '.') + "::" + l.getImplMethodName();
+
+                if (shortDescription) {
+                    String[] packages = l.getImplClass().split("/");
+                    String clazz = packages[packages.length - 1];
+                    String[] classes = clazz.split("\\$");
+                    return classes[classes.length - 1] + "::" + l.getImplMethodName();
+
+                } else {
+                    String longDesc = l.getImplClass().replace('/', '.') + "::" + l.getImplMethodName();
+                    return longDesc;
+                }
             }
             catch (NoSuchMethodException e) {}
             catch (IllegalAccessException | InvocationTargetException e) {

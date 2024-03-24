@@ -19,8 +19,11 @@
 
 package io.github.bitterfox.hamlet;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
+import static org.hamcrest.Matchers.notNullValue;
+
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 
 public class Hamlet {
     public static <T> HamletMatcher<T, T, ?> let() {
@@ -28,11 +31,11 @@ public class Hamlet {
     }
 
     public static <T> HamletMatcher<T, T, ?> let(Class<T> clazz) {
-        return new HamletMatcherStageRoot<>(Matchers.isA(clazz));
+        return new HamletMatcherStageRoot<>(isA(clazz));
     }
 
     public static <T, U> HamletMatcher<T, T, ?> let(MyFunction<? super T, ? extends U> function, Matcher<? super U> matcher) {
-        return new HamletMatcherStageRoot<T, Matcher<T>>(Matchers.notNullValue())
+        return new HamletMatcherStageRoot<T, Matcher<T>>(is(notNullValue()))
                 .let(function, matcher);
     }
 }

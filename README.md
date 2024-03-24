@@ -60,16 +60,18 @@ assertThat(
 
 java.lang.AssertionError:
 Expected:
-        io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:106) is <1L>
-        io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:107) is "name"
-        io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:108) a collection containing
-            io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:109) is <5L>]
-but:
-        io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:108) mismatches were: [
-        io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:109) was <90L>]
-at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)
-at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:6)
-at io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:104)
+        io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:124) it is not null
+        io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:124) User::getId is <1L>
+        io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:125) User::getName is "name"
+        io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:126) User::getFollowers a collection containing
+            io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:127) it is not null
+            io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:127) User::getId is <5L>
+     but:
+        io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:126) User::getFollowers mismatches were: [
+            io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:127) User::getId was <90L>]
+    at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)
+    at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:6)
+    at io.github.bitterfox.hamlet.HamletTest.test(HamletTest.java:122)
 
 // This output shows exactly where the mismatch occurred, allowing you to quickly navigate to the code from your IDE's output panel.
 ```

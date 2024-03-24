@@ -23,6 +23,7 @@ import org.hamcrest.Matcher;
 
 public class HamletMatcherStageLet<S, P, T, L, M extends Matcher<S>> extends HamletMatcherStage<S, P, T, L, M> {
     MyFunction<? super T, ? extends L> function;
+    boolean shortDescription = true;
 
     public HamletMatcherStageLet(HamletMatcherStage<S, ?, P, ?, ?> upstream, LetMatcher<? super L, ?> matcher,
                                  MyFunction<? super T, ? extends L> function) {
@@ -32,13 +33,18 @@ public class HamletMatcherStageLet<S, P, T, L, M extends Matcher<S>> extends Ham
 
     @Override
     protected void internalDescribeTo(HamletDescription description) {
-        description.appendLocation(location)
-                   .appendText("let it = " + LanguageUtil.describeMethodReference(function) + " in");
-        description.plusDepth(4);
-        try {
-            super.internalDescribeTo(description);
-        } finally {
-            description.minusDepth(4);
+        if (shortDescription) {
+            matcher.describeTo(description, LanguageUtil.describeMethodReference(function));
+
+        } else {
+            description.appendLocation(location)
+                       .appendText("let it = " + LanguageUtil.describeMethodReference(function) + " in");
+            description.plusDepth(4);
+            try {
+                super.internalDescribeTo(description);
+            } finally {
+                description.minusDepth(4);
+            }
         }
     }
 
