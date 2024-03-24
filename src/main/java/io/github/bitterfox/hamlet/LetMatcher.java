@@ -38,6 +38,10 @@ class LetMatcher<T, U> extends DiagnosingMatcher<T> {
 
     @Override
     protected boolean matches(Object item, Description mismatchDescription) {
+        return matches(item, mismatchDescription, "");
+    }
+
+    protected boolean matches(Object item, Description mismatchDescription, String valueDescription) {
         U value;
         try {
 //            value = function.apply((T) item);
@@ -56,6 +60,10 @@ class LetMatcher<T, U> extends DiagnosingMatcher<T> {
             desc = new HamletDescription(mismatchDescription);
         }
         desc.appendLocation(location);
+        if (!valueDescription.isEmpty()) {
+            desc.appendText(valueDescription)
+                    .appendText(" ");
+        }
         desc.plusDepth(4);
         try {
             matcher.describeMismatch(value, mismatchDescription);

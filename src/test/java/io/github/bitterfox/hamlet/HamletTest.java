@@ -61,6 +61,14 @@ class HamletTest {
             return name;
         }
 
+        public long getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
         public long createdTime() {
             return createdTime;
         }
@@ -109,6 +117,14 @@ class HamletTest {
                 900,
 //                Arrays.asList(new BankAccount(90, "$", 10))
                 Arrays.asList((BankAccount) null, new BankAccount(90L, "$", 100))
+        );
+
+        assertThat(
+                user,
+                Hamlet.let(User::getId, is(10L))
+                      .let(User::getName, is("myname"))
+                      .let(User::bankAccounts,
+                           hasItem(Hamlet.let(BankAccount::id, is(5L))))
         );
 
         HamletMatcherStage<User, ?, ?, ?, ?> matcher = (HamletMatcherStage<User, ?, ?, ?, ?>)

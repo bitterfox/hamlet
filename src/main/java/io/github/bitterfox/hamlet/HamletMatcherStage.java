@@ -144,7 +144,7 @@ abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends Diag
 
         if (matcher != null) {
             try {
-                return matcher.matches(value.letValue, mismatchDescription);
+                return matcher.matches(value.letValue, mismatchDescription, describeMethodReference());
             } catch (Exception e) {
                 e.printStackTrace();
             }
