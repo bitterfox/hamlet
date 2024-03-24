@@ -33,7 +33,7 @@ public class HamletMatcherStageRoot<S, M extends Matcher<S>> extends HamletMatch
     @Override
     protected boolean internalMatches(MappedValue<S, ?, ?, ?> value, HamletDescription mismatchDescription,
                                       boolean upstreamMatched) {
-        return matcher == null ? upstreamMatched : (matcher.matches(value.value, mismatchDescription) && upstreamMatched);
+        return matcher == null ? upstreamMatched : (upstreamMatched && matcher.matches(value.value, mismatchDescription));
     }
 
     @Override

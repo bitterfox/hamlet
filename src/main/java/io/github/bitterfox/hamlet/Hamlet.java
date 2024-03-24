@@ -31,7 +31,7 @@ public class Hamlet {
         return new HamletMatcherStageRoot<>(Matchers.isA(clazz));
     }
 
-    public static <T, U> HamletMatcher<T, T, ?> let(java.util.function.Function<? super T, ? extends U> function, Matcher<? super U> matcher) {
+    public static <T, U> HamletMatcher<T, T, ?> let(MyFunction<? super T, ? extends U> function, Matcher<? super U> matcher) {
         return new HamletMatcherStageRoot<T, Matcher<T>>(Matchers.notNullValue())
                 .let(function, matcher);
     }

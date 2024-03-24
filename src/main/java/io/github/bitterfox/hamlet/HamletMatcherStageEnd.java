@@ -30,4 +30,9 @@ public class HamletMatcherStageEnd<S, P, T, M extends Matcher<S>> extends Hamlet
     MappedValue<T, P, T, ?> requestValue(MappedValue<P, ?, ?, ?> upstreamValue) {
         return upstreamValue.end();
     }
+
+    @Override
+    protected void internalDescribeTo(HamletDescription description) {
+        description.minusDepth(4);
+    }
 }

@@ -19,9 +19,10 @@
 
 package io.github.bitterfox.hamlet;
 
+import static io.github.bitterfox.hamlet.LanguageUtil.findLocation;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.hamcrest.Description;
 import org.hamcrest.Description.NullDescription;
@@ -32,12 +33,14 @@ import org.hamcrest.Matchers;
 abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends DiagnosingMatcher<S> implements HamletMatcher<S, T, M> {
     private final HamletMatcherStage<S, ?, P, ?, ?> upstream;
     protected final LetMatcher<? super L, ?> matcher;
+    protected final StackTraceElement location;
 
     private final ThreadLocal<List<MappedValue<T, ?, L, ?>>> lastValues = ThreadLocal.withInitial(() -> new ArrayList<>());
 
     public HamletMatcherStage(HamletMatcherStage<S, ?, P, ?, ?> upstream, LetMatcher<? super L, ?> matcher) {
         this.upstream = upstream;
         this.matcher = matcher;
+        this.location = findLocation();
     }
 
     @Override
@@ -46,7 +49,7 @@ abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends Diag
     }
 
     @Override
-    public <U> HamletMatcherStage<S, T, T, U, M> let(java.util.function.Function<? super T, ? extends U> function,
+    public <U> HamletMatcherStage<S, T, T, U, M> let(MyFunction<? super T, ? extends U> function,
                                                      Matcher<? super U> matcher) {
         if (this.matcher == null) {
             return new HamletMatcherStageLet<>(this.it(Matchers.notNullValue()), new LetMatcher<>(/*function, */matcher), function);
@@ -56,7 +59,7 @@ abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends Diag
     }
 
     @Override
-    public <U> HamletMatcherStage<S, T, U, U, HamletMatcher<S, T, M>> letIn(Function<? super T, ? extends U> function) {
+    public <U> HamletMatcherStage<S, T, U, U, HamletMatcher<S, T, M>> letIn(MyFunction<? super T, ? extends U> function) {
         return new HamletMatcherStageLetIn<>(this, function);
     }
 
@@ -85,6 +88,10 @@ abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends Diag
             if (upstream.matcher != null) {
             }
         }
+        internalDescribeTo((HamletDescription) description);
+    }
+
+    protected void internalDescribeTo(HamletDescription description) {
         if (matcher != null) {
             matcher.describeTo(description);
         }
@@ -117,19 +124,27 @@ abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends Diag
         boolean matched = true;
         if (upstream != null) {
             matched = upstream.__matches((MappedValue<P, ?, ?, ?>) value.previousValue(), mismatchDescription);
-//            if (!matched) {
-//                return false;
-//            }
         }
         return internalMatches(value, mismatchDescription, matched);
     }
 
     protected boolean internalMatches(MappedValue<T, ?, ?, ?> value, HamletDescription mismatchDescription, boolean upstreamMatched) {
+        if (!upstreamMatched) {
+            return upstreamMatched;
+        }
+
+        if (value.failure != null) {
+            mismatchDescription
+                    .appendLocation(location)
+                    .appendText(describeMethodReference())
+                    .appendText(" throws ");
+            mismatchDescription.appendException(value.failure);
+            return false;
+        }
+
         if (matcher != null) {
             try {
-                if (value.value() != null) {
-                    return matcher.matches(value.letValue, mismatchDescription) && upstreamMatched;
-                }
+                return matcher.matches(value.letValue, mismatchDescription);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -139,11 +154,15 @@ abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends Diag
 
     MappedValue<T, P, L, ?> requestValue(Object item) {
         if (upstream == null) {
-            return new MappedValue<>(null, (T) item, (L) item, 0);
+            return new MappedValue<>(null, (T) item, (L) item, null, 0);
         }
 
         MappedValue<P, ?, ?, ?> value = upstream.requestValue(item);
         return requestValue(value);
+    }
+
+    protected String describeMethodReference() {
+        return "Unsupported in " + getClass().getName();
     }
 
     abstract MappedValue<T, P, L, ?> requestValue(MappedValue<P, ?, ?, ?> upstreamValue);

@@ -19,17 +19,15 @@
 
 package io.github.bitterfox.hamlet;
 
-import java.util.function.Function;
-
 import org.hamcrest.Matcher;
 
 public interface HamletMatcher<S, T, M extends Matcher<S>> extends Matcher<S> {
     // Should we change type of S?
     <U> HamletMatcher<S, U, M> as(Class<U> clazz);
 
-    <U> HamletMatcher<S, T, M> let(Function<? super T, ? extends U> function, Matcher<? super U> matcher);
+    <U> HamletMatcher<S, T, M> let(MyFunction<? super T, ? extends U> function, Matcher<? super U> matcher);
 
-    <U> HamletMatcher<S, U, HamletMatcher<S, T, M>> letIn(Function<? super T, ? extends U> function);
+    <U> HamletMatcher<S, U, HamletMatcher<S, T, M>> letIn(MyFunction<? super T, ? extends U> function);
 
     HamletMatcher<S, T, M> it(Matcher<? super T> matcher);
 

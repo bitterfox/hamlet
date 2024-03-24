@@ -142,6 +142,16 @@ class HamletTest {
                 user.bankAccounts(),
                 hasItem(Hamlet.let(BankAccount::id, is(90L)))
         );
+
+        assertThat(
+                user,
+                Hamlet.let(User.class)
+                        .letIn(User::bankAccounts)
+                        .letIn(l -> l.get(1))
+//                        .letIn(BankAccount::currency)
+//                        .it(is("yen"))
+                        .let(BankAccount::currency, is("$"))
+        );
     }
 
     @Test

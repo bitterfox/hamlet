@@ -19,8 +19,6 @@
 
 package io.github.bitterfox.hamlet;
 
-import java.util.function.Function;
-
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 
@@ -37,14 +35,14 @@ public class MockHamletMatcher<S, T, M extends Matcher<S>> implements HamletMatc
     }
 
     @Override
-    public <U> HamletMatcher<S, T, M> let(Function<? super T, ? extends U> function,
+    public <U> HamletMatcher<S, T, M> let(MyFunction<? super T, ? extends U> function,
                                           Matcher<? super U> matcher) {
         return this;
     }
 
     @Override
     public <U> HamletMatcher<S, U, HamletMatcher<S, T, M>> letIn(
-            Function<? super T, ? extends U> function) {
+            MyFunction<? super T, ? extends U> function) {
         return new MockHamletMatcher<>(this);
     }
 

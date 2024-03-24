@@ -19,22 +19,8 @@
 
 package io.github.bitterfox.hamlet;
 
-import org.hamcrest.Matcher;
+import java.io.Serializable;
+import java.util.function.Function;
 
-public class HamletMatcherStageIt<S, P, T, M extends Matcher<S>> extends HamletMatcherStage<S, P, T, T, M> {
-    public HamletMatcherStageIt(HamletMatcherStage<S, ?, P, ?, ?> upstream,
-                                LetMatcher<? super T, ?> mather) {
-        super(upstream, mather);
-    }
-
-    @Override
-    protected boolean internalMatches(MappedValue<T, ?, ?, ?> value, HamletDescription mismatchDescription,
-                                      boolean upstreamMatched) {
-        return matcher == null ? upstreamMatched : (upstreamMatched && matcher.matches(value.value, mismatchDescription));
-    }
-
-    @Override
-    MappedValue<T, P, T, ?> requestValue(MappedValue<P, ?, ?, ?> upstreamValue) {
-        return upstreamValue.identity();
-    }
+public interface MyFunction<T, U> extends Function<T, U>, Serializable {
 }

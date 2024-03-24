@@ -26,12 +26,14 @@ public class MappedValue<T, P, L, V extends MappedValue<P, ?, ?, ?>> {
     V previousValue;
     T value;
     L letValue;
+    Exception failure;
     int letInScope;
 
-    public MappedValue(V previousValue, T value, L letValue, int letInScope) {
+    public MappedValue(V previousValue, T value, L letValue, Exception failure, int letInScope) {
         this.previousValue = previousValue;
         this.value = value;
         this.letValue = letValue;
+        this.failure = failure;
         this.letInScope = letInScope;
     }
 
@@ -47,12 +49,16 @@ public class MappedValue<T, P, L, V extends MappedValue<P, ?, ?, ?>> {
     }
 
     <U, M> MappedValue<U, T, M, MappedValue<T, P, L, V>> identity() {
-        return new MappedValue<>(this, (U) this.value, (M) this.value, this.letInScope());
+        return new MappedValue<>(this, (U) this.value, (M) this.value, null, this.letInScope());
     }
 
     <U, M> MappedValue<U, T, M, MappedValue<T, P, L, V>> letIn(Function<? super T, ? extends U> f) {
-        U letIn = f.apply(value);
-        return new MappedValue<>(this, letIn, (M) letIn, this.letInScope + 1);
+        try {
+            U letIn = f.apply(value);
+            return new MappedValue<>(this, letIn, (M) letIn, null, this.letInScope + 1);
+        } catch (Exception e) {
+            return new MappedValue<>(this, null, (M) null, e, this.letInScope + 1);
+        }
     }
 
     <U, M> MappedValue<U, T, M, MappedValue<T, P, L, V>> end() {
@@ -61,17 +67,22 @@ public class MappedValue<T, P, L, V extends MappedValue<P, ?, ?, ?>> {
             letInValue = (MappedValue<T, P, ?, V>) letInValue.previousValue;
         }
         if (letInValue == null) {
-            return new MappedValue<>(this, null, null, this.letInScope - 1);
+            return new MappedValue<>(this, null, null, null, this.letInScope - 1);
         } else {
-            return new MappedValue<>(this, (U) letInValue.value(), (M) letInValue.value(), letInScope - 1);
+            return new MappedValue<>(this, (U) letInValue.value(), (M) letInValue.value(), null, letInScope - 1);
         }
     }
 
     <U, M> MappedValue<U, T, M, MappedValue<T, P, L, V>> let(Function<? super U, ? extends M> f) {
-        if (this.value == null) {
-            return new MappedValue<>(this, null, null, this.letInScope());
-        } else {
-            return new MappedValue<>(this, (U) this.value, f.apply((U) this.value), this.letInScope());
+        try {
+//            if (this.value == null) {
+//                return new MappedValue<>(this, null, null, null, this.letInScope());
+//            } else {
+                return new MappedValue<>(this, (U) this.value, f.apply((U) this.value), null,
+                                         this.letInScope());
+//            }
+        } catch (Exception e) {
+            return new MappedValue<>(this, (U) this.value, (M) null, e, this.letInScope);
         }
     }
 

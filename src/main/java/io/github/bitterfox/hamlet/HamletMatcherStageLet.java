@@ -19,17 +19,32 @@
 
 package io.github.bitterfox.hamlet;
 
-import java.util.function.Function;
-
 import org.hamcrest.Matcher;
 
 public class HamletMatcherStageLet<S, P, T, L, M extends Matcher<S>> extends HamletMatcherStage<S, P, T, L, M> {
-    Function<? super T, ? extends L> function;
+    MyFunction<? super T, ? extends L> function;
 
     public HamletMatcherStageLet(HamletMatcherStage<S, ?, P, ?, ?> upstream, LetMatcher<? super L, ?> matcher,
-                                 Function<? super T, ? extends L> function) {
+                                 MyFunction<? super T, ? extends L> function) {
         super(upstream, matcher);
         this.function = function;
+    }
+
+    @Override
+    protected void internalDescribeTo(HamletDescription description) {
+        description.appendLocation(location)
+                   .appendText("let it = " + LanguageUtil.describeMethodReference(function) + " in");
+        description.plusDepth(4);
+        try {
+            super.internalDescribeTo(description);
+        } finally {
+            description.minusDepth(4);
+        }
+    }
+
+    @Override
+    protected String describeMethodReference() {
+        return LanguageUtil.describeMethodReference(function);
     }
 
     @Override

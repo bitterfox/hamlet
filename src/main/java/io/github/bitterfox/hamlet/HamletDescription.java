@@ -19,6 +19,11 @@
 
 package io.github.bitterfox.hamlet;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,7 +45,7 @@ class HamletDescription implements Description {
 
     public Description appendLocation(StackTraceElement location) {
         return appendText(System.lineSeparator())
-                .appendText(Stream.generate(() -> " ").limit(DEPTH.get()).collect(Collectors.joining()))
+                .appendText(spaces(DEPTH.get()))
                 .appendText(location == null ? "(unknown)" : location.toString())
                 .appendText(" ");
     }
@@ -54,6 +59,10 @@ class HamletDescription implements Description {
     }
     public void minusDepth(int depth) {
         DEPTH.set(DEPTH.get() - depth);
+    }
+
+    private String spaces(int len) {
+        return Stream.generate(() -> " ").limit(len).collect(Collectors.joining());
     }
 
     @Override
@@ -76,5 +85,22 @@ class HamletDescription implements Description {
     public Description appendList(String start, String separator, String end,
                                   Iterable<? extends SelfDescribing> values) {
         return delegate.appendList(start, separator, end, values);
+    }
+
+    public void appendException(Exception failure) {
+        appendText(failure.getClass().getName()).appendText(System.lineSeparator());
+        try (StringWriter sw = new StringWriter();
+             PrintWriter pw = new PrintWriter(sw)) {
+            failure.printStackTrace(pw);
+
+            try (StringReader sr = new StringReader(sw.toString());
+                 BufferedReader br = new BufferedReader(sr)) {
+                br.lines().forEach(l -> this.appendText(spaces(DEPTH.get() + 4))
+                                            .appendText(l)
+                                            .appendText(System.lineSeparator()));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

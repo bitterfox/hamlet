@@ -19,6 +19,8 @@
 
 package io.github.bitterfox.hamlet;
 
+import static io.github.bitterfox.hamlet.LanguageUtil.findLocation;
+
 import org.hamcrest.Description;
 import org.hamcrest.DiagnosingMatcher;
 import org.hamcrest.Matcher;
@@ -26,7 +28,7 @@ import org.hamcrest.Matcher;
 class LetMatcher<T, U> extends DiagnosingMatcher<T> {
 //    private final Function<? super T, ? extends U> function;
     private final Matcher<U> matcher;
-    private final StackTraceElement location;
+    final StackTraceElement location;
 
     public LetMatcher(/*Function<? super T, ? extends U> function, */Matcher<U> matcher) {
 //        this.function = function;
@@ -71,7 +73,8 @@ class LetMatcher<T, U> extends DiagnosingMatcher<T> {
         } else {
             desc = new HamletDescription(description);
         }
-        desc.appendLocation(location);
+        desc.appendLocation(location)
+            .appendText("expect it ");
         desc.plusDepth(4);
         try {
             matcher.describeTo(desc);
@@ -80,15 +83,4 @@ class LetMatcher<T, U> extends DiagnosingMatcher<T> {
         }
     }
 
-    private StackTraceElement findLocation() {
-        for (StackTraceElement stackTrace : Thread.currentThread().getStackTrace()) {
-            if (!stackTrace.getClassName().equals(Thread.class.getName())
-                && !stackTrace.getClassName().equals(LetMatcher.class.getName())
-                && !stackTrace.getClassName().equals(Hamlet.class.getName())
-                && !stackTrace.getClassName().startsWith(HamletMatcherStage.class.getName())) {
-                return stackTrace;
-            }
-        }
-        return null;
-    }
 }
