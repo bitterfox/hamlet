@@ -149,7 +149,7 @@ abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends Diag
                 StringDescription desc = new StringDescription();
                 boolean match = matcher.matches(value.letValue, new HamletDescription(desc), describeMethodReference());
                 if (!match) {
-                    describeMismatchLetIn(mismatchDescription);
+                    describeMismatchLetIn(value, mismatchDescription);
                     mismatchDescription.appendText(desc.toString());
                 }
                 return match;
@@ -160,9 +160,9 @@ abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends Diag
         return upstreamMatched;
     }
 
-    protected void describeMismatchLetIn(HamletDescription mismatchDescription) {
+    protected void describeMismatchLetIn(MappedValue<T, ?, ?, ?> value, HamletDescription mismatchDescription) {
         if (upstream != null) {
-            upstream.describeMismatchLetIn(mismatchDescription);
+            upstream.describeMismatchLetIn((MappedValue<P, ?, ?, ?>) value.previousValue(), mismatchDescription);
         }
     }
 

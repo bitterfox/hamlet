@@ -127,7 +127,7 @@ class HamletTest {
 //                           hasItem(Hamlet.let(BankAccount::id, is(0L))))
                         .letIn(User::bankAccounts)
 //                        .let(List::size, is(4))
-                        .it(hasItem(Hamlet.let(BankAccount::id, is(90L))))
+                        .it(hasItem(Hamlet.let(BankAccount::id, is(0L))))
         );
 
         HamletMatcherStage<User, ?, ?, ?, ?> matcher = (HamletMatcherStage<User, ?, ?, ?, ?>)
@@ -138,7 +138,7 @@ class HamletTest {
                               Hamlet.let(BankAccount::id, is(90L))))
                       .letIn(User::bankAccounts)
                       .it(Matchers.isA(List.class))
-                      .it(hasItem(Hamlet.let(BankAccount::id, is(90L))))
+                      .it(hasItem(Hamlet.let(BankAccount::id, is(00L))))
                       .letIn(l -> l.get(1))
                       .let(BankAccount::currency, is("$"))
                       .end()

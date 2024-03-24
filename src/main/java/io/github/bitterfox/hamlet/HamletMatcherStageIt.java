@@ -42,7 +42,7 @@ public class HamletMatcherStageIt<S, P, T, M extends Matcher<S>> extends HamletM
         StringDescription desc = new StringDescription();
         boolean match = matcher.matches(value.value, new HamletDescription(desc));
         if (!match) {
-            this.describeMismatchLetIn(mismatchDescription);
+            this.describeMismatchLetIn(value, mismatchDescription);
             mismatchDescription.appendText(desc.toString());
         }
         return match;
