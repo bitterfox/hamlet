@@ -19,19 +19,17 @@
 
 package io.github.bitterfox.hamlet;
 
-import java.util.function.Function;
-
 import org.hamcrest.Description;
 import org.hamcrest.DiagnosingMatcher;
 import org.hamcrest.Matcher;
 
 class LetMatcher<T, U> extends DiagnosingMatcher<T> {
-    private final Function<? super T, ? extends U> function;
+//    private final Function<? super T, ? extends U> function;
     private final Matcher<U> matcher;
     private final StackTraceElement location;
 
-    public LetMatcher(Function<? super T, ? extends U> function, Matcher<U> matcher) {
-        this.function = function;
+    public LetMatcher(/*Function<? super T, ? extends U> function, */Matcher<U> matcher) {
+//        this.function = function;
         this.matcher = matcher;
         this.location = findLocation();
     }
@@ -40,7 +38,8 @@ class LetMatcher<T, U> extends DiagnosingMatcher<T> {
     protected boolean matches(Object item, Description mismatchDescription) {
         U value;
         try {
-            value = function.apply((T) item);
+//            value = function.apply((T) item);
+            value = (U) item;
         } catch (Exception e) {
             throw new RuntimeException(e.getClass() + " at " + location, e);
         }

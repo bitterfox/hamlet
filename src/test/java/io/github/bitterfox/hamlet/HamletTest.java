@@ -110,7 +110,7 @@ class HamletTest {
                 Arrays.asList((BankAccount) null, new BankAccount(90L, "$", 100))
         );
 
-        HamletMatcherImpl<User, ?, ?, ?> matcher = (HamletMatcherImpl<User, ?, ?, ?>)
+        HamletMatcherImpl<User, ?, ?, ?, ?> matcher = (HamletMatcherImpl<User, ?, ?, ?, ?>)
                 Hamlet.let(User::id, is(10L))
                       .let(User::name, is("myname"))
                       .let(User::createdTime, is(1234L))
@@ -124,7 +124,7 @@ class HamletTest {
                       .end()
                       .let(User::name, is("myname"));
 
-        MappedValue<?, ?, ?> value = matcher.requestValue(user);
+        MappedValue<?, ?, ?, ?> value = matcher.requestValue(user);
 
         assertThat(
                 user,

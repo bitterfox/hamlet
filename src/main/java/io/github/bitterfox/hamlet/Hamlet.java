@@ -24,15 +24,15 @@ import org.hamcrest.Matchers;
 
 public class Hamlet {
     public static <T> HamletMatcher<T, T, ?> let() {
-        return new HamletMatcherImpl<>(null, java.util.function.Function.identity(), null);
+        return new HamletMatcherImpl<>(null, null, java.util.function.Function.identity(), null);
     }
 
     public static <T> HamletMatcher<T, T, ?> let(Class<T> clazz) {
-        return new HamletMatcherImpl<>(null, java.util.function.Function.identity(), Matchers.isA(clazz));
+        return new HamletMatcherImpl<>(null, null, java.util.function.Function.identity(), Matchers.isA(clazz));
     }
 
     public static <T, U> HamletMatcher<T, T, ?> let(java.util.function.Function<? super T, ? extends U> function, Matcher<? super U> matcher) {
-        return new HamletMatcherImpl<T, T, T, Matcher<T>>(null, java.util.function.Function.identity(), Matchers.notNullValue())
+        return new HamletMatcherImpl<T, T, T, T, Matcher<T>>(null, null, java.util.function.Function.identity(), Matchers.notNullValue())
                 .let(function, matcher);
     }
 }

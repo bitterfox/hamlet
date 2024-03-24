@@ -29,64 +29,64 @@ import org.hamcrest.DiagnosingMatcher;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
-class HamletMatcherImpl<S, P, T, M extends Matcher<S>> extends DiagnosingMatcher<S> implements HamletMatcher<S, T, M> {
-    private final HamletMatcherImpl<S, ?, P, ?> upstream;
+class HamletMatcherImpl<S, P, T, L, M extends Matcher<S>> extends DiagnosingMatcher<S> implements HamletMatcher<S, T, M> {
+    private final HamletMatcherImpl<S, ?, P, ?, ?> upstream;
+    private final Function<? super T, ? extends L> let;
+    private final LetMatcher<? super L, ?> matcher;
     private final Function<? super P, ? extends T> letIn;
-    private final LetMatcher<? super T, ?> matcher;
 
-    private final ThreadLocal<List<MappedValue<T, ?, ?>>> lastValues = ThreadLocal.withInitial(() -> new ArrayList<>());
+    private final ThreadLocal<List<MappedValue<T, ?, L, ?>>> lastValues = ThreadLocal.withInitial(() -> new ArrayList<>());
 
-    public HamletMatcherImpl(HamletMatcherImpl<S, ?, P, ?> upstream, Function<? super P, ? extends T> letIn, LetMatcher<? super T, ?> matcher) {
+    public HamletMatcherImpl(HamletMatcherImpl<S, ?, P, ?, ?> upstream, Function<? super T, ? extends L> let, Function<? super P, ? extends T> letIn, LetMatcher<? super L, ?> matcher) {
         this.upstream = upstream;
-        this.letIn = letIn;
+        this.let = let;
         this.matcher = matcher;
+        this.letIn = letIn;
     }
 
-    public HamletMatcherImpl(HamletMatcherImpl<S, ?, P, ?> upstream, Function<? super P, ? extends T> letIn, Matcher<? super T> matcher) {
-        this.upstream = upstream;
-        this.letIn = letIn;
-        this.matcher = new LetMatcher<>(java.util.function.Function.identity(), matcher);
+    public HamletMatcherImpl(HamletMatcherImpl<S, ?, P, ?, ?> upstream, Function<? super T, ? extends L> let, Function<? super P, ? extends T> letIn, Matcher<? super L> matcher) {
+        this(upstream, let, letIn, new LetMatcher<>(matcher));
     }
 
     @Override
-    public <U> HamletMatcherImpl<S, T, U, M> as(Class<U> clazz) {
+    public <U> HamletMatcherImpl<S, T, U, U, M> as(Class<U> clazz) {
         return new HamletMatcherImpl<>(
                 this,
+                null,
                 null,
                 Matchers.instanceOf(clazz));
     }
 
     @Override
-    public <U> HamletMatcherImpl<S, T, T, M> let(java.util.function.Function<? super T, ? extends U> function,
+    public <U> HamletMatcherImpl<S, T, T, U, M> let(java.util.function.Function<? super T, ? extends U> function,
                                               Matcher<? super U> matcher) {
         if (this.matcher == null) {
-            return new HamletMatcherImpl<>(this.it(Matchers.notNullValue()), null, new LetMatcher<>(function, matcher));
+            return new HamletMatcherImpl<>(this.it(Matchers.notNullValue()), function, null, new LetMatcher<>(/*function, */matcher));
         } else {
-            return new HamletMatcherImpl<>(this, null, new LetMatcher<>(function, matcher));
+            return new HamletMatcherImpl<>(this, function, null, new LetMatcher<>(/*function, */matcher));
         }
     }
 
     @Override
-    public <U> HamletMatcherImpl<S, T, U, HamletMatcher<S, T, M>> letIn(Function<? super T, ? extends U> function) {
-        return new HamletMatcherImpl<>(this, function, null);
+    public <U> HamletMatcherImpl<S, T, U, U, HamletMatcher<S, T, M>> letIn(Function<? super T, ? extends U> function) {
+        return new HamletMatcherImpl<>(this, null, function, null);
     }
 
     @Override
-    public HamletMatcherImpl<S, T, T, M> it(Matcher<? super T> matcher) {
+    public HamletMatcherImpl<S, T, T, T, M> it(Matcher<? super T> matcher) {
         if (matcher instanceof LetMatcher) {
-            return new HamletMatcherImpl<>(this, null,
-                                           (LetMatcher<? super T, ?>) matcher);
+            return new HamletMatcherImpl<>(this, null, null, (LetMatcher<? super T, ?>) matcher);
         } else {
-            return new HamletMatcherImpl<>(this, null, new LetMatcher<>(java.util.function.Function.identity(), matcher));
+            return new HamletMatcherImpl<>(this, null, null, new LetMatcher<>(/*java.util.function.Function.identity(), */matcher));
         }
     }
 
     @Override
     public M end() {
-        return (M) new HamletMatcherImpl(this, null, null) {
+        return (M) new HamletMatcherImpl(this, null, null, null) {
             @Override
-            public MappedValue requestValue(Object item) {
-                MappedValue mappedValue = super.requestValue(item);
+            public MappedValue<T, P, L, ?> requestValue(Object item) {
+                MappedValue<T, P, L, ?> mappedValue = super.requestValue(item);
                 return mappedValue.previousValue().end();
             }
         };
@@ -116,7 +116,7 @@ class HamletMatcherImpl<S, P, T, M extends Matcher<S>> extends DiagnosingMatcher
 
         // ugly hack to avoid run functions many times
         // 1st is called with NullDescription
-        MappedValue<T, ?, ?> value;
+        MappedValue<T, ?, L, ?> value;
         if (mismatchDescription instanceof NullDescription) {
             value = requestValue(item);
             lastValues.get().add(value);
@@ -131,10 +131,10 @@ class HamletMatcherImpl<S, P, T, M extends Matcher<S>> extends DiagnosingMatcher
         return internalMatches(value, desc);
     }
 
-    private boolean internalMatches(MappedValue<T, ?, ?> value, HamletDescription mismatchDescription) {
+    private boolean internalMatches(MappedValue<T, ?, ?, ?> value, HamletDescription mismatchDescription) {
         boolean matched = true;
         if (upstream != null) {
-            matched = upstream.internalMatches((MappedValue<P, ?, ?>) value.previousValue(), mismatchDescription);
+            matched = upstream.internalMatches((MappedValue<P, ?, ?, ?>) value.previousValue(), mismatchDescription);
 //            if (!matched) {
 //                return false;
 //            }
@@ -142,7 +142,7 @@ class HamletMatcherImpl<S, P, T, M extends Matcher<S>> extends DiagnosingMatcher
         if (matcher != null) {
             try {
                 if (value.value() != null) {
-                    return matcher.matches(value.value(), mismatchDescription) && matched;
+                    return matcher.matches(value.letValue, mismatchDescription) && matched;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -151,18 +151,26 @@ class HamletMatcherImpl<S, P, T, M extends Matcher<S>> extends DiagnosingMatcher
         return matched;
     }
 
-    public MappedValue<T, P, ?> requestValue(Object item) {
+    public MappedValue<T, P, L, ?> requestValue(Object item) {
         if (upstream == null) {
-            return new MappedValue<>(null, (T) item, false);
+            return new MappedValue<>(null, (T) item, (L) item, 0);
         }
 
-        MappedValue<P, ?, ?> value = upstream.requestValue(item);
+        MappedValue<P, ?, ?, ?> value = upstream.requestValue(item);
 
-        if (letIn == null) {
-            // pass through, T == P
+        if (value.value == null) {
             return value.identity();
         }
 
-        return value.letIn(letIn.apply(value.value()));
+        if (letIn != null) {
+            return value.letIn(letIn);
+        }
+
+        if (let != null) {
+            return value.let(let);
+        }
+
+        // value: T == P
+        return value.identity();
     }
 }

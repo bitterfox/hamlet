@@ -19,36 +19,19 @@
 
 package io.github.bitterfox.hamlet;
 
-public class MappedValue<T, P, V extends MappedValue<P, ?, ?>> {
+import java.util.function.Function;
+
+public class MappedValue<T, P, L, V extends MappedValue<P, ?, ?, ?>> {
     V previousValue;
     T value;
+    L letValue;
     int letInScope;
 
-    public MappedValue(V previousValue, T value, int letInScope) {
+    public MappedValue(V previousValue, T value, L letValue, int letInScope) {
         this.previousValue = previousValue;
         this.value = value;
+        this.letValue = letValue;
         this.letInScope = letInScope;
-    }
-
-    public MappedValue(V previousValue, T value, boolean letIn, boolean end) {
-        this(previousValue, value, letIn);
-
-        if (end) {
-            letInScope = letInScope - 1;
-        }
-    }
-    public MappedValue(V previousValue, T value, boolean letIn) {
-        this.previousValue = previousValue;
-        this.value = value;
-        if (previousValue != null) {
-            if (letIn) {
-                letInScope = previousValue.letInScope() + 1;
-            } else {
-                letInScope = previousValue.letInScope();
-            }
-        } else {
-            letInScope = 0;
-        }
     }
 
     public T value() {
@@ -62,23 +45,28 @@ public class MappedValue<T, P, V extends MappedValue<P, ?, ?>> {
         return letInScope;
     }
 
-    <U> MappedValue<U, T, MappedValue<T, P, V>> identity() {
-        return new MappedValue<>(this, (U) this.value, this.letInScope());
+    <U, M> MappedValue<U, T, M, MappedValue<T, P, L, V>> identity() {
+        return new MappedValue<>(this, (U) this.value, (M) this.value, this.letInScope());
     }
 
-    <U> MappedValue<U, T, MappedValue<T, P, V>> letIn(U value) {
-        return new MappedValue<>(this, value, this.letInScope + 1);
+    <U, M> MappedValue<U, T, M, MappedValue<T, P, L, V>> letIn(Function<? super T, ? extends U> f) {
+        U letIn = f.apply(value);
+        return new MappedValue<>(this, letIn, (M) letIn, this.letInScope + 1);
     }
 
-    <U> MappedValue<U, T, MappedValue<T, P, V>> end() {
-        MappedValue letInValue = this;
+    <U, M> MappedValue<U, T, M, MappedValue<T, P, L, V>> end() {
+        MappedValue<T, P, ?, V> letInValue = this;
         while (letInValue != null && this.letInScope <= letInValue.letInScope()) {
-            letInValue = letInValue.previousValue;
+            letInValue = (MappedValue<T, P, ?, V>) letInValue.previousValue;
         }
         if (letInValue == null) {
-            return new MappedValue(this, null, this.letInScope - 1);
+            return new MappedValue<>(this, null, null, this.letInScope - 1);
         } else {
-            return new MappedValue(this, letInValue.value(), letInScope - 1);
+            return new MappedValue<>(this, (U) letInValue.value(), (M) letInValue.value(), letInScope - 1);
         }
+    }
+
+    <U, M> MappedValue<U, T, M, MappedValue<T, P, L, V>> let(Function<? super U, ? extends M> f) {
+        return new MappedValue<>(this, (U) this.value, f.apply((U) this.value), this.letInScope());
     }
 }
