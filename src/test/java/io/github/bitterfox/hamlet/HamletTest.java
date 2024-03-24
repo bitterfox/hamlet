@@ -26,6 +26,7 @@ import static org.hamcrest.Matchers.nullValue;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 
@@ -108,9 +109,7 @@ class HamletTest {
                 Arrays.asList((BankAccount) null, new BankAccount(90L, "$", 100))
         );
 
-
-        assertThat(
-                user,
+        HamletMatcherImpl<User, ?, ?, ?> matcher = (HamletMatcherImpl<User, ?, ?, ?>)
                 Hamlet.let(User::id, is(10L))
                       .let(User::name, is("myname"))
                       .let(User::createdTime, is(1234L))
@@ -122,7 +121,13 @@ class HamletTest {
                       .let(BankAccount::currency, is("$"))
                       .end()
                       .end()
-                      .end()
+                      .let(User::name, is("myname"));
+
+        MappedValue<?, ?, ?> value = matcher.requestValue(user);
+
+        assertThat(
+                user,
+                matcher
         );
 
         assertThat(
@@ -138,6 +143,26 @@ class HamletTest {
                 user,
                 Hamlet.let()
                       .it(nullValue())
+        );
+    }
+
+    @Test
+    void testNoIdempotent() {
+        class Test {
+            AtomicInteger i = new AtomicInteger();
+
+            int process (){
+                return i.incrementAndGet();
+            }
+        }
+
+        Test test = new Test();
+
+        assertThat(test,
+                   Hamlet.let(Test.class)
+                         .letIn(Test::process)
+                         .it(is(1))
+                         .it(is(1))
         );
     }
 }
