@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 
 class HamletTest {
@@ -158,11 +159,21 @@ class HamletTest {
 
         Test test = new Test();
 
+        Matcher<Integer> m = Hamlet.let(Integer.class);
+//                                   .it(is(0));
+
         assertThat(test,
                    Hamlet.let(Test.class)
-                         .letIn(Test::process)
+                         .letIn(Test::process) // 1
+                         .it(m)
                          .it(is(1))
-                         .it(is(1))
+                         .end()
+                         .letIn(Test::process) // 2
+                         .it(m)
+                         .it(m)
+                         .end()
+                         .let(Test::process, m) // 3
+                         .let(Test::process, m) // 4
         );
     }
 }

@@ -19,6 +19,8 @@
 
 package io.github.bitterfox.hamlet;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 import org.hamcrest.Description;
@@ -31,6 +33,8 @@ class HamletMatcherImpl<S, P, T, M extends Matcher<S>> extends DiagnosingMatcher
     private final HamletMatcherImpl<S, ?, P, ?> upstream;
     private final Function<? super P, ? extends T> letIn;
     private final LetMatcher<? super T, ?> matcher;
+
+    private final ThreadLocal<List<MappedValue<T, ?, ?>>> lastValues = ThreadLocal.withInitial(() -> new ArrayList<>());
 
     public HamletMatcherImpl(HamletMatcherImpl<S, ?, P, ?> upstream, Function<? super P, ? extends T> letIn, LetMatcher<? super T, ?> matcher) {
         this.upstream = upstream;
@@ -115,7 +119,19 @@ class HamletMatcherImpl<S, P, T, M extends Matcher<S>> extends DiagnosingMatcher
 
     @Override
     protected boolean matches(Object item, Description mismatchDescription) {
-        MappedValue<T, ?, ?> value = requestValue(item);
+        // matches called twice in case of failure
+        // 1st is to check whether object matches
+        // 2nd is to create a description when match failed
+
+        // ugly hack to avoid run functions many times
+        // 1st is called with NullDescription
+        MappedValue<T, ?, ?> value;
+        if (mismatchDescription instanceof NullDescription) {
+            value = requestValue(item);
+            lastValues.get().add(value);
+        } else {
+            value = lastValues.get().remove(lastValues.get().size() - 1);
+        }
 
         HamletDescription desc = mismatchDescription instanceof HamletDescription
                                  ? (HamletDescription) mismatchDescription
@@ -125,21 +141,21 @@ class HamletMatcherImpl<S, P, T, M extends Matcher<S>> extends DiagnosingMatcher
     }
 
     private boolean internalMatches(MappedValue<T, ?, ?> value, HamletDescription mismatchDescription) {
-
+        boolean matched = true;
         if (upstream != null) {
-            boolean matched = upstream.internalMatches((MappedValue<P, ?, ?>) value.previousValue(), mismatchDescription);
-            if (!matched) {
-                return false;
-            }
+            matched = upstream.internalMatches((MappedValue<P, ?, ?>) value.previousValue(), mismatchDescription);
+//            if (!matched) {
+//                return false;
+//            }
         }
         if (matcher != null) {
             try {
-                return matcher.matches(value.value(), mismatchDescription);
+                return matcher.matches(value.value(), mismatchDescription) && matched;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        return true;
+        return matched;
     }
 
     public MappedValue<T, P, ?> requestValue(Object item) {
