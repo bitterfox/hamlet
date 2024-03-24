@@ -20,6 +20,7 @@
 package io.github.bitterfox.hamlet;
 
 import org.hamcrest.Matcher;
+import org.hamcrest.StringDescription;
 
 public class HamletMatcherStageIt<S, P, T, M extends Matcher<S>> extends HamletMatcherStage<S, P, T, T, M> {
     public HamletMatcherStageIt(HamletMatcherStage<S, ?, P, ?, ?> upstream,
@@ -30,7 +31,21 @@ public class HamletMatcherStageIt<S, P, T, M extends Matcher<S>> extends HamletM
     @Override
     protected boolean internalMatches(MappedValue<T, ?, ?, ?> value, HamletDescription mismatchDescription,
                                       boolean upstreamMatched) {
-        return matcher == null ? upstreamMatched : (upstreamMatched && matcher.matches(value.value, mismatchDescription));
+        if (matcher == null) {
+            return upstreamMatched;
+        }
+
+        if (!upstreamMatched) {
+            return false;
+        }
+
+        StringDescription desc = new StringDescription();
+        boolean match = matcher.matches(value.value, new HamletDescription(desc));
+        if (!match) {
+            this.describeMismatchLetIn(mismatchDescription);
+            mismatchDescription.appendText(desc.toString());
+        }
+        return match;
     }
 
     @Override

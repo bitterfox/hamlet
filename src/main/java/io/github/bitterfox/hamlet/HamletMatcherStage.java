@@ -30,9 +30,10 @@ import org.hamcrest.Description;
 import org.hamcrest.Description.NullDescription;
 import org.hamcrest.DiagnosingMatcher;
 import org.hamcrest.Matcher;
+import org.hamcrest.StringDescription;
 
 abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends DiagnosingMatcher<S> implements HamletMatcher<S, T, M> {
-    private final HamletMatcherStage<S, ?, P, ?, ?> upstream;
+    protected final HamletMatcherStage<S, ?, P, ?, ?> upstream;
     protected final LetMatcher<? super L, ?> matcher;
     protected final StackTraceElement location;
 
@@ -145,12 +146,24 @@ abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends Diag
 
         if (matcher != null) {
             try {
-                return matcher.matches(value.letValue, mismatchDescription, describeMethodReference());
+                StringDescription desc = new StringDescription();
+                boolean match = matcher.matches(value.letValue, new HamletDescription(desc), describeMethodReference());
+                if (!match) {
+                    describeMismatchLetIn(mismatchDescription);
+                    mismatchDescription.appendText(desc.toString());
+                }
+                return match;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         return upstreamMatched;
+    }
+
+    protected void describeMismatchLetIn(HamletDescription mismatchDescription) {
+        if (upstream != null) {
+            upstream.describeMismatchLetIn(mismatchDescription);
+        }
     }
 
     MappedValue<T, P, L, ?> requestValue(Object item) {

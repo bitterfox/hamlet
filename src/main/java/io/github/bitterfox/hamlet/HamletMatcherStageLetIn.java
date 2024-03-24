@@ -45,4 +45,17 @@ public class HamletMatcherStageLetIn<S, P, T, M extends Matcher<S>> extends Haml
     protected String describeMethodReference() {
         return LanguageUtil.describeMethodReference(function);
     }
+
+    @Override
+    protected void describeMismatchLetIn(HamletDescription mismatchDescription) {
+        mismatchDescription.minusDepth(4);
+        try {
+            super.describeMismatchLetIn(mismatchDescription);
+            mismatchDescription.appendLocation(location)
+                               .appendText(
+                                       "let it = " + LanguageUtil.describeMethodReference(function) + " in");
+        } finally {
+            mismatchDescription.plusDepth(4);
+        }
+    }
 }
