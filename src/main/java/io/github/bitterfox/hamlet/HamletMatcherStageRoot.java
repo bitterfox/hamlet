@@ -40,4 +40,19 @@ public class HamletMatcherStageRoot<S, M extends Matcher<S>> extends HamletMatch
     MappedValue<S, S, S, ?> requestValue(MappedValue<S, ?, ?, ?> upstreamValue) {
         throw new IllegalStateException("requestValue for root should not be called");
     }
+
+    @Override
+    protected void describeMismatchLetIn(MappedValue<S, ?, ?, ?> value, HamletDescription mismatchDescription) {
+        // This is called when there's mismatch in downstream
+        // Let's print root object value
+
+        mismatchDescription.setDepth(4);
+        mismatchDescription.appendLocation(location);
+        mismatchDescription.appendValue(value.value());
+    }
+
+    @Override
+    protected void internalDescribeTo(HamletDescription description) {
+        description.setDepth(8);
+    }
 }

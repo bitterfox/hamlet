@@ -48,17 +48,18 @@ public class HamletMatcherStageLetIn<S, P, T, M extends Matcher<S>> extends Haml
 
     @Override
     protected void describeMismatchLetIn(MappedValue<T, ?, ?, ?> value, HamletDescription mismatchDescription) {
-        mismatchDescription.minusDepth(4);
+//        mismatchDescription.minusDepth(4);
         try {
             super.describeMismatchLetIn(value, mismatchDescription);
 //            mismatchDescription.appendLocation(location)
 //                               .appendText(
 //                                       "let it = " + LanguageUtil.describeMethodReference(function) + " in");
+            mismatchDescription.plusDepth(4);
             mismatchDescription.appendLocation(location)
                                .appendText(
                                        "let it = " + value.value() + " in");
         } finally {
-            mismatchDescription.plusDepth(4);
+//            mismatchDescription.plusDepth(4);
         }
     }
 }

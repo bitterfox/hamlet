@@ -64,11 +64,11 @@ class LetMatcher<T, U> extends DiagnosingMatcher<T> {
             desc.appendText(valueDescription)
                     .appendText(" ");
         }
-        desc.plusDepth(4);
+        desc.plusDepth(8);
         try {
             matcher.describeMismatch(value, mismatchDescription);
         } finally {
-            desc.minusDepth(4);
+            desc.minusDepth(8);
         }
         return false;
     }

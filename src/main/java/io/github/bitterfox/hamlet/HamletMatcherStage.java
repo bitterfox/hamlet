@@ -23,6 +23,9 @@ import static io.github.bitterfox.hamlet.LanguageUtil.findLocation;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -150,7 +153,15 @@ abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends Diag
                 boolean match = matcher.matches(value.letValue, new HamletDescription(desc), describeMethodReference());
                 if (!match) {
                     describeMismatchLetIn(value, mismatchDescription);
-                    mismatchDescription.appendText(desc.toString());
+
+                    mismatchDescription.plusDepth(4);
+                    try (BufferedReader br = new BufferedReader(new StringReader(desc.toString()))) {
+                        br.lines()
+                          .forEach(l -> mismatchDescription.appendIndent().appendText(l)
+                                                           .appendText(System.lineSeparator()));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
                 return match;
             } catch (Exception e) {

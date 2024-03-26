@@ -19,6 +19,10 @@
 
 package io.github.bitterfox.hamlet;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+
 import org.hamcrest.Matcher;
 import org.hamcrest.StringDescription;
 
@@ -43,7 +47,16 @@ public class HamletMatcherStageIt<S, P, T, M extends Matcher<S>> extends HamletM
         boolean match = matcher.matches(value.value, new HamletDescription(desc));
         if (!match) {
             this.describeMismatchLetIn(value, mismatchDescription);
-            mismatchDescription.appendText(desc.toString());
+            String string = desc.toString();
+//            mismatchDescription.appendText(string);
+            mismatchDescription.plusDepth(4);
+            try (BufferedReader br = new BufferedReader(new StringReader(string))) {
+                br.lines()
+                  .forEach(l -> mismatchDescription.appendIndent().appendText(l)
+                                                   .appendText(System.lineSeparator()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return match;
     }

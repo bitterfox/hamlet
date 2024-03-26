@@ -80,6 +80,17 @@ class HamletTest {
         public List<BankAccount> bankAccounts() {
             return bankAccounts;
         }
+
+        @Override
+        public String toString() {
+            return "User{" +
+                   "id=" + id +
+                   ", name='" + name + '\'' +
+                   ", createdTime=" + createdTime +
+                   ", updatedTime=" + updatedTime +
+                   ", bankAccounts=" + bankAccounts +
+                   '}';
+        }
     }
 
     class BankAccount {
@@ -103,6 +114,15 @@ class HamletTest {
 
         public long amount() {
             return amount;
+        }
+
+        @Override
+        public String toString() {
+            return "BankAccount{" +
+                   "id=" + id +
+                   ", currency='" + currency + '\'' +
+                   ", amount=" + amount +
+                   '}';
         }
     }
 

@@ -33,6 +33,7 @@ import org.hamcrest.SelfDescribing;
 class HamletDescription implements Description {
     private final Description delegate;
     private static final ThreadLocal<Integer> DEPTH = ThreadLocal.withInitial(() -> 8);
+    private int depth = 0;
 
     public HamletDescription(Description delegate) {
         this.delegate = delegate;
@@ -43,9 +44,13 @@ class HamletDescription implements Description {
         return delegate.appendText(text);
     }
 
+    public Description appendIndent() {
+        return appendText(spaces(depth));
+    }
+
     public Description appendLocation(StackTraceElement location) {
         return appendText(System.lineSeparator())
-                .appendText(spaces(DEPTH.get()))
+                .appendText(spaces(depth))
                 .appendText(location == null ? "(unknown)" : location.toString())
                 .appendText(" ");
     }
@@ -54,11 +59,17 @@ class HamletDescription implements Description {
         return delegate;
     }
 
+    public void setDepth(int depth) {
+        DEPTH.set(depth);
+        this.depth = depth;
+    }
     public void plusDepth(int depth) {
         DEPTH.set(DEPTH.get() + depth);
+        this.depth += depth;
     }
     public void minusDepth(int depth) {
         DEPTH.set(DEPTH.get() - depth);
+        this.depth -= depth;
     }
 
     private String spaces(int len) {
