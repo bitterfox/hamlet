@@ -32,7 +32,6 @@ import org.hamcrest.SelfDescribing;
 
 class HamletDescription implements Description {
     private final Description delegate;
-    private static final ThreadLocal<Integer> DEPTH = ThreadLocal.withInitial(() -> 8);
     private int depth = 0;
 
     public HamletDescription(Description delegate) {
@@ -60,15 +59,12 @@ class HamletDescription implements Description {
     }
 
     public void setDepth(int depth) {
-        DEPTH.set(depth);
         this.depth = depth;
     }
     public void plusDepth(int depth) {
-        DEPTH.set(DEPTH.get() + depth);
         this.depth += depth;
     }
     public void minusDepth(int depth) {
-        DEPTH.set(DEPTH.get() - depth);
         this.depth -= depth;
     }
 
@@ -106,7 +102,7 @@ class HamletDescription implements Description {
 
             try (StringReader sr = new StringReader(sw.toString());
                  BufferedReader br = new BufferedReader(sr)) {
-                br.lines().forEach(l -> this.appendText(spaces(DEPTH.get() + 4))
+                br.lines().forEach(l -> this.appendText(spaces(depth + 4))
                                             .appendText(l)
                                             .appendText(System.lineSeparator()));
             }
