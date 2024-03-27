@@ -33,6 +33,13 @@ public class HamletMatcherStageIt<S, P, T, M extends Matcher<S>> extends HamletM
     }
 
     @Override
+    protected void internalDescribeTo(HamletDescription description) {
+        super.internalDescribeTo(description);
+
+        matcher.describeTo(description);
+    }
+
+    @Override
     protected boolean internalMatches(MappedValue<T, ?, ?, ?> value, HamletDescription mismatchDescription,
                                       boolean upstreamMatched) {
         if (matcher == null) {

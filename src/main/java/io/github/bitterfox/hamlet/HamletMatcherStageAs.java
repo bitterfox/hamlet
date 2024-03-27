@@ -31,4 +31,11 @@ public class HamletMatcherStageAs<S, P, T, M extends Matcher<S>> extends HamletM
     MappedValue<T, P, T, ?> requestValue(MappedValue<P, ?, ?, ?> upstreamValue) {
         return upstreamValue.identity();
     }
+
+    @Override
+    protected void internalDescribeTo(HamletDescription description) {
+        super.internalDescribeTo(description);
+
+        matcher.describeTo(description);
+    }
 }

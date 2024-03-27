@@ -77,6 +77,7 @@ class LetMatcher<T, U> extends DiagnosingMatcher<T> {
     public void describeTo(Description description) {
         describeTo(description, "");
     }
+
     public void describeTo(Description description, String valueDescription) {
         HamletDescription desc;
         if (description instanceof HamletDescription) {

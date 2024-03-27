@@ -84,21 +84,28 @@ abstract class HamletMatcherStage<S, P, T, L, M extends Matcher<S>> extends Diag
 
     @Override
     public void describeTo(Description description) {
-        if (!(description instanceof HamletDescription)) {
-            description = new HamletDescription(description);
+        if (description instanceof HamletDescription) {
+            internalDescribeTo((HamletDescription) description);
+            return;
         }
 
-        if (upstream != null) {
-            upstream.describeTo(description);
-            if (upstream.matcher != null) {
-            }
+        StringDescription stringDescription = new StringDescription();
+        HamletDescription hamletDescription = new HamletDescription(stringDescription);
+        internalDescribeTo(hamletDescription);
+
+        try (BufferedReader br = new BufferedReader(new StringReader(stringDescription.toString()))) {
+            description.appendText(System.lineSeparator());
+            br.lines()
+              .forEach(l -> description.appendText("        |" + l)
+                                       .appendText(System.lineSeparator()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        internalDescribeTo((HamletDescription) description);
     }
 
     protected void internalDescribeTo(HamletDescription description) {
-        if (matcher != null) {
-            matcher.describeTo(description);
+        if (upstream != null) {
+            upstream.internalDescribeTo(description);
         }
     }
 

@@ -33,15 +33,16 @@ public class HamletMatcherStageLet<S, P, T, L, M extends Matcher<S>> extends Ham
 
     @Override
     protected void internalDescribeTo(HamletDescription description) {
+        super.internalDescribeTo(description);
+
         if (shortDescription) {
             matcher.describeTo(description, LanguageUtil.describeMethodReference(function));
-
         } else {
             description.appendLocation(location)
                        .appendText("let it = " + LanguageUtil.describeMethodReference(function) + " in");
             description.plusDepth(4);
             try {
-                super.internalDescribeTo(description);
+                matcher.describeTo(description);
             } finally {
                 description.minusDepth(4);
             }

@@ -53,6 +53,8 @@ public class HamletMatcherStageRoot<S, M extends Matcher<S>> extends HamletMatch
 
     @Override
     protected void internalDescribeTo(HamletDescription description) {
-        description.setDepth(8);
+        if (matcher != null) {
+            matcher.describeTo(description);
+        }
     }
 }

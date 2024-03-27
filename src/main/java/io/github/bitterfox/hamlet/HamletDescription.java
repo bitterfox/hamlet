@@ -40,18 +40,21 @@ class HamletDescription implements Description {
 
     @Override
     public Description appendText(String text) {
-        return delegate.appendText(text);
+        delegate.appendText(text);
+        return this;
     }
 
     public Description appendIndent() {
-        return appendText(spaces(depth));
+        appendText(spaces(depth));
+        return this;
     }
 
     public Description appendLocation(StackTraceElement location) {
-        return appendText(System.lineSeparator())
+        appendText(System.lineSeparator())
                 .appendText(spaces(depth))
                 .appendText(location == null ? "(unknown)" : location.toString())
                 .appendText(" ");
+        return this;
     }
 
     public Description getDelegate() {
@@ -68,30 +71,45 @@ class HamletDescription implements Description {
         this.depth -= depth;
     }
 
+    public int getDepth() {
+        return depth;
+    }
+
     private String spaces(int len) {
         return Stream.generate(() -> " ").limit(len).collect(Collectors.joining());
     }
 
     @Override
-    public Description appendDescriptionOf(SelfDescribing value) {return delegate.appendDescriptionOf(value);}
+    public Description appendDescriptionOf(SelfDescribing value) {
+        value.describeTo(this);
+        return this;
+
+//        return delegate.appendDescriptionOf(value);
+    }
 
     @Override
-    public Description appendValue(Object value) {return delegate.appendValue(value);}
+    public Description appendValue(Object value) {
+        delegate.appendValue(value);
+        return this;
+    }
 
     @Override
     public <T> Description appendValueList(String start, String separator, String end, T... values) {
-        return delegate.appendValueList(start, separator, end, values);
+        delegate.appendValueList(start, separator, end, values);
+        return this;
     }
 
     @Override
     public <T> Description appendValueList(String start, String separator, String end, Iterable<T> values) {
-        return delegate.appendValueList(start, separator, end, values);
+        delegate.appendValueList(start, separator, end, values);
+        return this;
     }
 
     @Override
     public Description appendList(String start, String separator, String end,
                                   Iterable<? extends SelfDescribing> values) {
-        return delegate.appendList(start, separator, end, values);
+        delegate.appendList(start, separator, end, values);
+        return this;
     }
 
     public void appendException(Exception failure) {

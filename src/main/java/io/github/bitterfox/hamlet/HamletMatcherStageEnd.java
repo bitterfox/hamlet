@@ -33,6 +33,7 @@ public class HamletMatcherStageEnd<S, P, T, M extends Matcher<S>> extends Hamlet
 
     @Override
     protected void internalDescribeTo(HamletDescription description) {
+        super.describeTo(description);
         description.minusDepth(4);
     }
 }
